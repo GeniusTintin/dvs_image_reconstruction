@@ -78,9 +78,25 @@ High_pass_filter::~High_pass_filter()
 void High_pass_filter::eventsCallback(const dvs_msgs::EventArray::ConstPtr& msg)
 {
   // initialisation only to be performed once at the beginning
+  uint32_t msg_height = msg->height;
+  uint32_t msg_width = msg->width;
+
+  if(msg_height == 0 || msg_width == 0){
+    if(user_defined_){
+      msg_height = user_defined_height_;
+      msg_width = user_defined_width_;
+    }
+    else{
+      user_defined_size();
+      msg_height = user_defined_height_;
+      msg_width = user_defined_width_;
+    }
+  }
+
+
   if (!initialised_)
   {
-    initialise_image_states(msg->height, msg->width);
+    initialise_image_states(msg_height, msg_width);
   }
 
   if (msg->events.size() > 0)
@@ -90,7 +106,7 @@ void High_pass_filter::eventsCallback(const dvs_msgs::EventArray::ConstPtr& msg)
     {
       const int x = msg->events[i].x;
       const int y = msg->events[i].y;
-      if (x < msg->width && x > 0 && y < msg->height && y > 0) // preserve border
+      if (x < msg_width && x > 0 && y < msg_height && y > 0) // preserve border
       {
         const double ts = msg->events[i].ts.toSec();
         const bool polarity = msg->events[i].polarity;
@@ -381,6 +397,16 @@ void High_pass_filter::reconfigureCallback(pure_event_reconstruction::pure_event
   spatial_smoothing_method_ = int(config.Bilateral_filter);
   adaptive_dynamic_range_ = config.Auto_adjust_dynamic_range;
   color_image_ = config.Color_display;
+}
+
+void High_pass_filter::user_defined_size(){
+
+  std::cout << "Enter height & width:" << std::endl;
+  std::cout << "Height: ";
+  std::cin >> user_defined_height_;
+  std::cout << "Width: ";
+  std::cin >> user_defined_width_;
+  user_defined_ = true;
 }
 
 } // namespace

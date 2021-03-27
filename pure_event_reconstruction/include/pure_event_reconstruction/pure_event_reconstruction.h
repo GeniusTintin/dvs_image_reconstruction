@@ -56,6 +56,7 @@ private:
   void convert_log_intensity_state_to_display_image(cv::Mat& display_image, const double& ts);
   void minMaxLocRobust(const cv::Mat& image, double* lower_bound, double* upper_bound,
                                           const double& percentage_pixels_to_discard);
+  void user_defined_size();
 
   // dynamic reconfigure
   boost::shared_ptr<dynamic_reconfigure::Server<pure_event_reconstruction::pure_event_reconstructionConfig> > server_;
@@ -74,15 +75,18 @@ private:
   cv::Mat ts_array_on_; // for leaky_event_count_on_
   cv::Mat ts_array_off_; // for leaky_event_count_off_
 
-  bool initialised_;
+  bool initialised_ = false;
   bool adaptive_contrast_threshold_;
   bool adaptive_dynamic_range_;
   bool save_images_;
   bool color_image_;
+  bool user_defined_ = false;
 
   std::string save_dir_;
 
   int spatial_smoothing_method_;
+  uint32_t user_defined_height_;
+  uint32_t user_defined_width_;
 
   // cutoff frequencies
   double cutoff_frequency_global_; /** rad/s */
